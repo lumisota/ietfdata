@@ -47,7 +47,8 @@
 from datetime    import datetime, timedelta
 from enum        import Enum
 from typing      import List, Optional, Tuple, Dict, Iterator, Type, TypeVar
-from dataclasses import dataclass
+from dataclasses import dataclass, _MISSING_TYPE
+from datafiles   import datafile, Missing
 from pavlova     import Pavlova
 from pavlova.parsers import GenericParser
 
@@ -64,35 +65,41 @@ import re
 # ---------------------------------------------------------------------------------------------------------------------------------
 # URI types:
 
-@dataclass(frozen=True)
+@dataclass
 class URI:
     uri : str
 
+    def datum(self) -> str:
+        return self.uri.split("/")[-2]
 
-@dataclass(frozen=True)
+
+@dataclass
 class DocumentURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/document/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/doc/document/")
 
 
-@dataclass(frozen=True)
+@dataclass
 class GroupURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/group/group/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/group/group/")
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Types relating to people:
 
-@dataclass(frozen=True)
+@dataclass
 class PersonURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/person/") or self.uri.startswith("/api/v1/person/historicalperson/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/person/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/person/person/{self.id}.json")
+@dataclass
 class Person:
-    resource_uri    : PersonURI
     id              : int
     name            : str
     name_from_draft : str
@@ -104,10 +111,31 @@ class Person:
     photo_thumb     : str
     biography       : str
     consent         : bool
+    resource_uri    : PersonURI
 
 
-@dataclass(frozen=True)
-class HistoricalPerson(Person):
+@dataclass
+class HistoricalPersonURI(URI):
+    def __post_init__(self) -> None:
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/historicalperson/")
+
+
+@datafile("datatracker/person/historialperson/{self.history_id}.json")
+@dataclass
+class HistoricalPerson:
+    resource_uri          : HistoricalPersonURI
+    id                    : int
+    name                  : str
+    name_from_draft       : str
+    ascii                 : str
+    ascii_short           : Optional[str]
+    user                  : str
+    time                  : str
+    photo                 : str
+    photo_thumb           : str
+    biography             : str
+    consent               : bool
     history_change_reason : Optional[str]
     history_user          : Optional[str]
     history_id            : int
@@ -115,13 +143,15 @@ class HistoricalPerson(Person):
     history_date          : str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PersonAliasURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/alias/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/alias/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/person/alias/{self.id}.json")
+@dataclass
 class PersonAlias:
     id                 : int
     resource_uri       : PersonAliasURI
@@ -129,13 +159,15 @@ class PersonAlias:
     name               : str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PersonEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/personevent/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/personevent/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/person/personevent/{self.id}.json")
+@dataclass
 class PersonEvent:
     desc            : str
     id              : int
@@ -148,13 +180,15 @@ class PersonEvent:
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Types relating to email addresses:
 
-@dataclass(frozen=True)
+@dataclass
 class EmailURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/email/") or self.uri.startswith("/api/v1/person/historicalemail/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/email/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/person/email/{self.address}.json")
+@dataclass
 class Email:
     resource_uri : EmailURI
     person       : PersonURI
@@ -165,8 +199,23 @@ class Email:
     active       : bool
 
 
-@dataclass(frozen=True)
-class HistoricalEmail(Email):
+@dataclass
+class HistoricalEmailURI(URI):
+    def __post_init__(self) -> None:
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/person/historicalemail/")
+
+
+@datafile("datatracker/person/historicalemail/{self.history_id}.json")
+@dataclass
+class HistoricalEmail:
+    resource_uri          : HistoricalEmailURI
+    person                : PersonURI
+    address               : str # The email address
+    time                  : str
+    origin                : str
+    primary               : bool
+    active                : bool
     history_change_reason : Optional[str]
     history_user          : Optional[str]
     history_id            : int
@@ -177,13 +226,15 @@ class HistoricalEmail(Email):
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Types relating to documents:
 
-@dataclass(frozen=True)
+@dataclass
 class DocumentTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/doctypename/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/name/doctypename/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/name/doctypename/{self.slug}.json")
+@dataclass
 class DocumentType:
     resource_uri : DocumentTypeURI
     name         : str
@@ -194,26 +245,30 @@ class DocumentType:
     order        : int
 
 
-@dataclass(frozen=True)
+@dataclass
 class DocumentStateTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/statetype/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/doc/statetype/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/doc/statetype/{self.slug}.json")
+@dataclass
 class DocumentStateType:
     resource_uri : DocumentStateTypeURI
     label        : str
     slug         : str
 
 
-@dataclass(frozen=True)
+@dataclass
 class DocumentStateURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/state/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/doc/state/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/doc/state/{self.id}.json")
+@dataclass
 class DocumentState:
     id           : int
     resource_uri : DocumentStateURI
@@ -226,13 +281,15 @@ class DocumentState:
     used         : bool
 
 
-@dataclass(frozen=True)
+@dataclass
 class StreamURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/streamname/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/name/streamname/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/name/streamname/{self.slug}.json")
+@dataclass
 class Stream:
     resource_uri : StreamURI
     name         : str
@@ -242,13 +299,15 @@ class Stream:
     order        : int
 
 
-@dataclass(frozen=True)
+@dataclass
 class SubmissionURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/submit/submission/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/submit/submission/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/submit/submission/{self.id}.json")
+@dataclass
 class Submission:
     abstract        : str
     access_key      : str
@@ -276,13 +335,15 @@ class Submission:
     words           : Optional[int]
 
 
-@dataclass(frozen=True)
+@dataclass
 class SubmissionEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/submit/submissionevent/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/submit/submissionevent/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/submit/submissionevent/{self.id}.json")
+@dataclass
 class SubmissionEvent:
     by              : Optional[PersonURI]
     desc            : str
@@ -295,11 +356,12 @@ class SubmissionEvent:
 # DocumentURI is defined earlier, to avoid circular dependencies
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/doc/document/{self.name}.json")
+@dataclass
 class Document:
+    name               : str
     id                 : int
     resource_uri       : DocumentURI
-    name               : str
     title              : str
     pages              : Optional[int]
     words              : Optional[int]
@@ -326,8 +388,8 @@ class Document:
     external_url       : str
 
     def __post_init__(self) -> None:
-        assert self.intended_std_level is None or self.intended_std_level.startswith("/api/v1/name/intendedstdlevelname/")
-        assert self.std_level          is None or self.std_level.startswith("/api/v1/name/stdlevelname/")
+        assert self.intended_std_level is _MISSING_TYPE or self.intended_std_level is None or self.intended_std_level.startswith("/api/v1/name/intendedstdlevelname/")
+        assert self.std_level          is _MISSING_TYPE or self.std_level          is None or self.std_level.startswith("/api/v1/name/stdlevelname/")
 
     def document_url(self) -> str:
         if self.type == DocumentTypeURI("/api/v1/name/doctypename/agenda/"):
@@ -368,13 +430,15 @@ class Document:
         return url
 
 
-@dataclass(frozen=True)
+@dataclass
 class DocumentAliasURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/docalias/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/doc/docalias/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/doc/docalias/{self.id}.json")
+@dataclass
 class DocumentAlias:
     id           : int
     resource_uri : DocumentAliasURI
@@ -382,13 +446,15 @@ class DocumentAlias:
     name         : str
 
 
-@dataclass(frozen=True)
+@dataclass
 class DocumentEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/docevent/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/doc/docevent/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/doc/docevent/{self.id}.json")
+@dataclass
 class DocumentEvent:
     by              : PersonURI
     desc            : str
@@ -407,7 +473,8 @@ class DocumentEvent:
 # GroupURI is defined earlier, to avoid circular dependencies
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/group/group/{self.id}.json")
+@dataclass
 class Group:
     acronym        : str
     ad             : Optional[PersonURI]
@@ -428,13 +495,15 @@ class Group:
     unused_tags    : List[str]
 
 
-@dataclass(frozen=True)
+@dataclass
 class GroupStateURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/groupstatename/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/name/groupstatename/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/name/groupstatename/{self.slug}.json")
+@dataclass
 class GroupState:
     resource_uri   : GroupStateURI
     slug           : str
@@ -453,19 +522,22 @@ class MeetingStatus(Enum):
     COMPLETED = 3
 
 
-@dataclass(frozen=True)
+@dataclass
 class MeetingURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/meeting/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/meeting/meeting/")
 
 
-@dataclass(frozen=True)
+@dataclass
 class MeetingTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/meetingtypename/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/name/meetingtypename/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/name/meetingtypename/{self.slug}.json")
+@dataclass
 class MeetingType:
     name         : str
     order        : int
@@ -475,13 +547,15 @@ class MeetingType:
     used         : bool
 
 
-@dataclass(frozen=True)
+@dataclass
 class ScheduleURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/schedule/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/meeting/schedule/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/meeting/schedule/{self.id}.json")
+@dataclass
 class Schedule:
     id           : int
     name         : str
@@ -493,7 +567,8 @@ class Schedule:
     badness      : Optional[str]
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/meeting/meeting/{self.id}.json")
+@dataclass
 class Meeting:
     id                               : int
     resource_uri                     : MeetingURI
@@ -538,19 +613,22 @@ class Meeting:
             return MeetingStatus.ONGOING
 
 
-@dataclass(frozen=True)
+@dataclass
 class SessionURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/session/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/meeting/session/")
 
 
-@dataclass(frozen=True)
+@dataclass
 class TimeslotURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/timeslot/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/meeting/timeslot/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/meeting/timeslot/{self.id}.json")
+@dataclass
 class Timeslot:
     id            : int
     resource_uri  : TimeslotURI
@@ -560,18 +638,20 @@ class Timeslot:
     name          : str
     time          : str
     duration      : str
-    location      : str               # FIXME this is a URI "/api/v1/meeting/room/668
+    location      : str               # FIXME this is a URI "/api/v1/meeting/room/668
     show_location : bool
     modified      : str
 
 
-@dataclass(frozen=True)
+@dataclass
 class AssignmentURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/schedtimesessassignment/")
+        assert True
+        #assert self.uri is _MISSING_TYPE or self.uri.startswith("/api/v1/meeting/schedtimesessassignment/")
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/meeting/schedtimesessassignment/{self.id}.json")
+@dataclass
 class Assignment:
     """
     The assignment of a `session` to a `timeslot` within a meeting `schedule`
@@ -589,7 +669,8 @@ class Assignment:
     badness      : int
 
 
-@dataclass(frozen=True)
+@datafile("datatracker/meeting/session/{self.id}.json")
+@dataclass
 class Session:
     id                  : int
     type                : str           # FIXME: this is a URI
@@ -619,31 +700,31 @@ class DataTracker:
     """
     def __init__(self):
         self.session  = requests.Session()
-        self.ua       = "glasgow-ietfdata/0.2.0"          # Update when making a new relaase
+        self.ua       = "glasgow-ietfdata/0.2.0"          # Update when making a new relaase
         self.base_url = "https://datatracker.ietf.org"
         self.pavlova = Pavlova()
-        # Please sort the following alphabetically:
-        self.pavlova.register_parser(AssignmentURI,        GenericParser(self.pavlova, AssignmentURI))
+        self.pavlova.register_parser(EmailURI,             GenericParser(self.pavlova, EmailURI))
+        self.pavlova.register_parser(PersonURI,            GenericParser(self.pavlova, PersonURI))
+        self.pavlova.register_parser(PersonAliasURI,       GenericParser(self.pavlova, PersonAliasURI))
+        self.pavlova.register_parser(PersonEventURI,       GenericParser(self.pavlova, PersonEventURI))
+        self.pavlova.register_parser(GroupURI,             GenericParser(self.pavlova, GroupURI))
+        self.pavlova.register_parser(GroupStateURI,        GenericParser(self.pavlova, GroupStateURI))
+        self.pavlova.register_parser(DocumentURI,          GenericParser(self.pavlova, DocumentURI))
         self.pavlova.register_parser(DocumentAliasURI,     GenericParser(self.pavlova, DocumentAliasURI))
-        self.pavlova.register_parser(DocumentEventURI,     GenericParser(self.pavlova, DocumentEventURI))
         self.pavlova.register_parser(DocumentStateURI,     GenericParser(self.pavlova, DocumentStateURI))
         self.pavlova.register_parser(DocumentStateTypeURI, GenericParser(self.pavlova, DocumentStateTypeURI))
         self.pavlova.register_parser(DocumentTypeURI,      GenericParser(self.pavlova, DocumentTypeURI))
-        self.pavlova.register_parser(DocumentURI,          GenericParser(self.pavlova, DocumentURI))
-        self.pavlova.register_parser(EmailURI,             GenericParser(self.pavlova, EmailURI))
-        self.pavlova.register_parser(GroupStateURI,        GenericParser(self.pavlova, GroupStateURI))
-        self.pavlova.register_parser(GroupURI,             GenericParser(self.pavlova, GroupURI))
-        self.pavlova.register_parser(MeetingTypeURI,       GenericParser(self.pavlova, MeetingTypeURI))
-        self.pavlova.register_parser(MeetingURI,           GenericParser(self.pavlova, MeetingURI))
-        self.pavlova.register_parser(PersonAliasURI,       GenericParser(self.pavlova, PersonAliasURI))
-        self.pavlova.register_parser(PersonEventURI,       GenericParser(self.pavlova, PersonEventURI))
-        self.pavlova.register_parser(PersonURI,            GenericParser(self.pavlova, PersonURI))
-        self.pavlova.register_parser(SessionURI,           GenericParser(self.pavlova, SessionURI))
-        self.pavlova.register_parser(ScheduleURI,          GenericParser(self.pavlova, ScheduleURI))
+        self.pavlova.register_parser(DocumentEventURI,     GenericParser(self.pavlova, DocumentEventURI))
         self.pavlova.register_parser(StreamURI,            GenericParser(self.pavlova, StreamURI))
-        self.pavlova.register_parser(SubmissionEventURI,   GenericParser(self.pavlova, SubmissionEventURI))
         self.pavlova.register_parser(SubmissionURI,        GenericParser(self.pavlova, SubmissionURI))
+        self.pavlova.register_parser(MeetingURI,           GenericParser(self.pavlova, MeetingURI))
+        self.pavlova.register_parser(MeetingTypeURI,       GenericParser(self.pavlova, MeetingTypeURI))
+        self.pavlova.register_parser(ScheduleURI,          GenericParser(self.pavlova, ScheduleURI))
         self.pavlova.register_parser(TimeslotURI,          GenericParser(self.pavlova, TimeslotURI))
+        self.pavlova.register_parser(AssignmentURI,        GenericParser(self.pavlova, AssignmentURI))
+        self.pavlova.register_parser(SubmissionEventURI,   GenericParser(self.pavlova, SubmissionEventURI))
+        self.pavlova.register_parser(HistoricalEmailURI,   GenericParser(self.pavlova, HistoricalEmailURI))
+        self.pavlova.register_parser(HistoricalPersonURI,  GenericParser(self.pavlova, HistoricalPersonURI))
 
 
     def __del__(self):
@@ -652,6 +733,7 @@ class DataTracker:
 
     def _retrieve(self, resource_uri: URI, obj_type: Type[T]) -> Optional[T]:
         headers = {'user-agent': self.ua}
+        print("#")
         r = self.session.get(self.base_url + resource_uri.uri, headers=headers, verify=True, stream=False)
         if r.status_code == 200:
             return self.pavlova.from_mapping(r.json(), obj_type)
@@ -688,7 +770,11 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/person/alias/
 
     def person(self, person_uri: PersonURI) -> Optional[Person]:
-        return self._retrieve(person_uri, Person)
+        try:
+            p = Person.objects.get(int(person_uri.datum()))
+        except FileNotFoundError:
+            p = self._retrieve(person_uri, Person)
+        return p
 
 
     def person_from_email(self, email_addr: str) -> Optional[Person]:
@@ -700,19 +786,28 @@ class DataTracker:
 
 
     def person_aliases(self, person: Person) -> Iterator[PersonAlias]:
-        url = "/api/v1/person/alias/?person=" + str(person.id)
-        return self._retrieve_multi(url, PersonAlias)
-
+        try:
+            pas = PersonAlias.objects.filter(person=person)
+        except FileNotFoundError:
+            url = "/api/v1/person/alias/?person=" + str(person.id)
+            pas = self._retrieve_multi(url, PersonAlias)
+        return pas
 
     def person_history(self, person: Person) -> Iterator[HistoricalPerson]:
-        url = "/api/v1/person/historicalperson/?id=" + str(person.id)
-        return self._retrieve_multi(url, HistoricalPerson)
-
+        try:
+            ps = HistoricalPerson.objects.filter(id=person.id)
+        except FileNotFoundError:
+            url = "/api/v1/person/historicalperson/?id=" + str(person.id)
+            ps = self._retrieve_multi(url, HistoricalPerson)
+        return ps
 
     def person_events(self, person: Person) -> Iterator[PersonEvent]:
-        url = "/api/v1/person/personevent/?person=" + str(person.id)
-        return self._retrieve_multi(url, PersonEvent)
-
+        try:
+            es = PersonEvent.objects.filter(person=person)
+        except FileNotFoundError:
+            url = "/api/v1/person/personevent/?person=" + str(person.id)
+            es = self._retrieve_multi(url, PersonEvent)
+        return es
 
     def people(self,
             since : str ="1970-01-01T00:00:00",
@@ -742,7 +837,11 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/person/historicalemail/
 
     def email(self, email_uri: EmailURI) -> Optional[Email]:
-        return self._retrieve(email_uri, Email)
+        try:
+            e = Email.objects.get(email_uri.datum())
+        except FileNotFoundError:
+            e = self._retrieve(email_uri, Email)
+        return e
 
 
     def email_for_person(self, person: Person) -> Iterator[Email]:
@@ -783,8 +882,8 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/doc/document/draft-ietf-avt-rtp-new/ - info about document
 
     def document(self, document_uri: DocumentURI) -> Optional[Document]:
-        return self._retrieve(document_uri, Document)
-
+        d = Document.objects.get(document_uri.datum())
+        return d
 
     def documents(self,
             since   : str = "1970-01-01T00:00:00",
@@ -1193,10 +1292,6 @@ class DataTracker:
         in each timeslot of the meeting in this version of the meeting schedule.
         """
         return self._retrieve(schedule_uri, Schedule)
-
-
-    def meeting_session_assignment(self, assignment_uri : AssignmentURI) -> Optional[Assignment]:
-        return self._retrieve(assignment_uri, Assignment)
 
 
     def meeting_session_assignments(self,
