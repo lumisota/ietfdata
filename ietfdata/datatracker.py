@@ -50,6 +50,7 @@ from typing      import List, Optional, Tuple, Dict, Iterator, Type, TypeVar
 from dataclasses import dataclass
 from pavlova     import Pavlova
 from pavlova.parsers import GenericParser
+from pathlib import Path
 
 T = TypeVar('T')
 
@@ -640,11 +641,12 @@ class DataTracker:
     """
     A class for interacting with the IETF DataTracker.
     """
-    def __init__(self):
+    def __init__(self, cachedir: Optional[Path] = None):
         self.session  = requests.Session()
         self.ua       = "glasgow-ietfdata/0.2.0"          # Update when making a new relaase
         self.base_url = "https://datatracker.ietf.org"
-        self.pavlova = Pavlova()
+        self.cachedir = cachedir
+        self.pavlova  = Pavlova()
         # Please sort the following alphabetically:
         self.pavlova.register_parser(AssignmentURI,        GenericParser(self.pavlova, AssignmentURI))
         self.pavlova.register_parser(DocumentAliasURI,     GenericParser(self.pavlova, DocumentAliasURI))
@@ -670,18 +672,33 @@ class DataTracker:
         self.pavlova.register_parser(TimeslotURI,          GenericParser(self.pavlova, TimeslotURI))
 
 
+
     def __del__(self):
         self.session.close()
 
 
     def _retrieve(self, resource_uri: URI, obj_type: Type[T]) -> Optional[T]:
-        headers = {'user-agent': self.ua}
-        r = self.session.get(self.base_url + resource_uri.uri, headers=headers, verify=True, stream=False)
-        if r.status_code == 200:
-            return self.pavlova.from_mapping(r.json(), obj_type)
+        # construct cache file path, if needed
+        cache_filepath = None
+        if self.cachedir is not None:
+            cache_filepath = Path(self.cachedir, resource_uri.uri[1:-1] + ".json")
+        # check if object exists in the cache: if so, load from file; if not, request from Datatracker
+        if cache_filepath is not None and cache_filepath.exists():
+            with open(cache_filepath) as cache_file:
+                data = json.load(cache_file)
         else:
-            print("_retrieve failed: {}".format(r.status_code))
-            return None
+            headers = {'user-agent': self.ua}
+            r = self.session.get(self.base_url + resource_uri.uri, headers=headers, verify=True, stream=False)
+            if r.status_code == 200:
+                data = r.json()
+                if cache_filepath is not None:
+                    cache_filepath.parent.mkdir(parents=True, exist_ok=True)
+                    with open(cache_filepath, "w") as cache_file:
+                        json.dump(data, cache_file)
+            else:
+                print("_retrieve failed: {}".format(r.status_code))
+                return None
+        return self.pavlova.from_mapping(data, obj_type)
 
 
     def _retrieve_multi(self, uri: str, obj_type: Type[T]) -> Iterator[T]:

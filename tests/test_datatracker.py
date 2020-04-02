@@ -30,6 +30,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from ietfdata.datatracker import *
+from pathlib              import Path
 
 # =================================================================================================================================
 # Unit tests:
@@ -42,7 +43,7 @@ class TestDatatracker(unittest.TestCase):
 
     @classmethod
     def setUpClass(self) -> None:
-        self.dt = DataTracker()
+        self.dt = DataTracker(cachedir=Path("dt_cache/"))
 
     def test_email(self) -> None:
         e  = self.dt.email(EmailURI("/api/v1/person/email/csp@csperkins.org"))
