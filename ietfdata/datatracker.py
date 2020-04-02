@@ -72,13 +72,13 @@ class URI:
 @dataclass(frozen=True)
 class DocumentURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/document/")
+        assert self.uri.startswith("doc/document/")
 
 
 @dataclass(frozen=True)
 class GroupURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/group/group/")
+        assert self.uri.startswith("group/group/")
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ class GroupURI(URI):
 @dataclass(frozen=True)
 class PersonURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/person/") or self.uri.startswith("/api/v1/person/historicalperson/")
+        assert self.uri.startswith("person/person/") or self.uri.startswith("person/historicalperson/")
 
 
 @dataclass(frozen=True)
@@ -118,7 +118,7 @@ class HistoricalPerson(Person):
 @dataclass(frozen=True)
 class PersonAliasURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/alias/")
+        assert self.uri.startswith("person/alias/")
 
 
 @dataclass(frozen=True)
@@ -132,7 +132,7 @@ class PersonAlias:
 @dataclass(frozen=True)
 class PersonEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/personevent/")
+        assert self.uri.startswith("person/personevent/")
 
 
 @dataclass(frozen=True)
@@ -151,7 +151,7 @@ class PersonEvent:
 @dataclass(frozen=True)
 class EmailURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/person/email/") or self.uri.startswith("/api/v1/person/historicalemail/")
+        assert self.uri.startswith("person/email/") or self.uri.startswith("person/historicalemail/")
 
 
 @dataclass(frozen=True)
@@ -180,7 +180,7 @@ class HistoricalEmail(Email):
 @dataclass(frozen=True)
 class DocumentTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/doctypename/")
+        assert self.uri.startswith("name/doctypename/")
 
 
 @dataclass(frozen=True)
@@ -197,7 +197,7 @@ class DocumentType:
 @dataclass(frozen=True)
 class DocumentStateTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/statetype/")
+        assert self.uri.startswith("doc/statetype/")
 
 
 @dataclass(frozen=True)
@@ -210,7 +210,7 @@ class DocumentStateType:
 @dataclass(frozen=True)
 class DocumentStateURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/state/")
+        assert self.uri.startswith("doc/state/")
 
 
 @dataclass(frozen=True)
@@ -229,7 +229,7 @@ class DocumentState:
 @dataclass(frozen=True)
 class StreamURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/streamname/")
+        assert self.uri.startswith("name/streamname/")
 
 
 @dataclass(frozen=True)
@@ -245,7 +245,7 @@ class Stream:
 @dataclass(frozen=True)
 class SubmissionURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/submit/submission/")
+        assert self.uri.startswith("submit/submission/")
 
 
 @dataclass(frozen=True)
@@ -279,7 +279,7 @@ class Submission:
 @dataclass(frozen=True)
 class SubmissionEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/submit/submissionevent/")
+        assert self.uri.startswith("submit/submissionevent/")
 
 
 @dataclass(frozen=True)
@@ -326,42 +326,42 @@ class Document:
     external_url       : str
 
     def __post_init__(self) -> None:
-        assert self.intended_std_level is None or self.intended_std_level.startswith("/api/v1/name/intendedstdlevelname/")
-        assert self.std_level          is None or self.std_level.startswith("/api/v1/name/stdlevelname/")
+        assert self.intended_std_level is None or self.intended_std_level.startswith("name/intendedstdlevelname/")
+        assert self.std_level          is None or self.std_level.startswith("name/stdlevelname/")
 
     def document_url(self) -> str:
-        if self.type == DocumentTypeURI("/api/v1/name/doctypename/agenda/"):
+        if self.type == DocumentTypeURI("name/doctypename/agenda/"):
             # FIXME: This doesn't work for interim meetings
             # FIXME: This doesn't work for PDF agenda files
             mtg = self.name.split("-")[1]
             url = "https://datatracker.ietf.org/meeting/" + mtg + "/materials/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/bluesheets/"):
+        elif self.type == DocumentTypeURI("name/doctypename/bluesheets/"):
             mtg = self.name.split("-")[1]
             url = "https://www.ietf.org/proceedings/" + mtg + "/bluesheets/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/charter/"):
+        elif self.type == DocumentTypeURI("name/doctypename/charter/"):
             url = "https://www.ietf.org/charter/"     + self.name + "-" + self.rev + ".txt"
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/conflrev/"):
+        elif self.type == DocumentTypeURI("name/doctypename/conflrev/"):
             url = "https://www.ietf.org/cr/"          + self.name + "-" + self.rev + ".txt"
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/draft/"):
+        elif self.type == DocumentTypeURI("name/doctypename/draft/"):
             url = "https://www.ietf.org/archive/id/"  + self.name + "-" + self.rev + ".txt"
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/liaison/"):
+        elif self.type == DocumentTypeURI("name/doctypename/liaison/"):
             url = "https://www.ietf.org/lib/dt/documents/LIAISON/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/liai-att/"):
+        elif self.type == DocumentTypeURI("name/doctypename/liai-att/"):
             url = "https://www.ietf.org/lib/dt/documents/LIAISON/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/minutes/"):
+        elif self.type == DocumentTypeURI("name/doctypename/minutes/"):
             mtg = self.name.split("-")[1]
             url = "https://datatracker.ietf.org/meeting/" + mtg + "/materials/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/recording/"):
+        elif self.type == DocumentTypeURI("name/doctypename/recording/"):
             url = self.external_url
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/review/"):
+        elif self.type == DocumentTypeURI("name/doctypename/review/"):
             # FIXME: This points to the formatted HTML page containing the message, but we really want the raw message
             url = "https://datatracker.ietf.org/doc/" + self.name
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/shepwrit/"):
+        elif self.type == DocumentTypeURI("name/doctypename/shepwrit/"):
             url = self.external_url
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/slides/"):
+        elif self.type == DocumentTypeURI("name/doctypename/slides/"):
             mtg = self.name.split("-")[1]
             url = "https://www.ietf.org/proceedings/" + mtg + "/slides/" + self.uploaded_filename
-        elif self.type == DocumentTypeURI("/api/v1/name/doctypename/statchg/"):
+        elif self.type == DocumentTypeURI("name/doctypename/statchg/"):
             url = "https://www.ietf.org/sc/"          + self.name + "-" + self.rev + ".txt"
         else:
             raise NotImplementedError
@@ -371,7 +371,7 @@ class Document:
 @dataclass(frozen=True)
 class DocumentAliasURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/docalias/")
+        assert self.uri.startswith("doc/docalias/")
 
 
 @dataclass(frozen=True)
@@ -385,7 +385,7 @@ class DocumentAlias:
 @dataclass(frozen=True)
 class DocumentEventURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/docevent/")
+        assert self.uri.startswith("doc/docevent/")
 
 
 @dataclass(frozen=True)
@@ -403,7 +403,7 @@ class DocumentEvent:
 @dataclass(frozen=True)
 class DocumentAuthorURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/doc/documentauthor/")
+        assert self.uri.startswith("doc/documentauthor/")
 
 @dataclass(frozen=True)
 class DocumentAuthor:
@@ -448,7 +448,7 @@ class Group:
 @dataclass(frozen=True)
 class GroupStateURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/groupstatename/")
+        assert self.uri.startswith("name/groupstatename/")
 
 
 @dataclass(frozen=True)
@@ -473,13 +473,13 @@ class MeetingStatus(Enum):
 @dataclass(frozen=True)
 class MeetingURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/meeting/")
+        assert self.uri.startswith("meeting/meeting/")
 
 
 @dataclass(frozen=True)
 class MeetingTypeURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/name/meetingtypename/")
+        assert self.uri.startswith("name/meetingtypename/")
 
 
 @dataclass(frozen=True)
@@ -495,7 +495,7 @@ class MeetingType:
 @dataclass(frozen=True)
 class ScheduleURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/schedule/")
+        assert self.uri.startswith("meeting/schedule/")
 
 
 @dataclass(frozen=True)
@@ -564,13 +564,13 @@ class Meeting:
 @dataclass(frozen=True)
 class SessionURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/session/")
+        assert self.uri.startswith("meeting/session/")
 
 
 @dataclass(frozen=True)
 class TimeslotURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/timeslot/")
+        assert self.uri.startswith("meeting/timeslot/")
 
 
 @dataclass(frozen=True)
@@ -591,7 +591,7 @@ class Timeslot:
 @dataclass(frozen=True)
 class AssignmentURI(URI):
     def __post_init__(self) -> None:
-        assert self.uri.startswith("/api/v1/meeting/schedtimesessassignment/")
+        assert self.uri.startswith("meeting/schedtimesessassignment/")
 
 
 @dataclass(frozen=True)
@@ -643,7 +643,7 @@ class DataTracker:
     def __init__(self):
         self.session  = requests.Session()
         self.ua       = "glasgow-ietfdata/0.2.0"          # Update when making a new relaase
-        self.base_url = "https://datatracker.ietf.org"
+        self.base_url = "https://datatracker.ietf.org/api/v1/"
         self.pavlova = Pavlova()
         # Please sort the following alphabetically:
         self.pavlova.register_parser(AssignmentURI,        GenericParser(self.pavlova, AssignmentURI))
@@ -716,7 +716,7 @@ class DataTracker:
 
 
     def person_from_email(self, email_addr: str) -> Optional[Person]:
-        email = self.email(EmailURI("/api/v1/person/email/" + email_addr + "/"))
+        email = self.email(EmailURI("person/email/" + email_addr + "/"))
         if email is not None:
             return self.person(email.person)
         else:
@@ -724,17 +724,17 @@ class DataTracker:
 
 
     def person_aliases(self, person: Person) -> Iterator[PersonAlias]:
-        url = "/api/v1/person/alias/?person=" + str(person.id)
+        url = "person/alias/?person=" + str(person.id)
         return self._retrieve_multi(url, PersonAlias)
 
 
     def person_history(self, person: Person) -> Iterator[HistoricalPerson]:
-        url = "/api/v1/person/historicalperson/?id=" + str(person.id)
+        url = "person/historicalperson/?id=" + str(person.id)
         return self._retrieve_multi(url, HistoricalPerson)
 
 
     def person_events(self, person: Person) -> Iterator[PersonEvent]:
-        url = "/api/v1/person/personevent/?person=" + str(person.id)
+        url = "person/personevent/?person=" + str(person.id)
         return self._retrieve_multi(url, PersonEvent)
 
 
@@ -754,7 +754,7 @@ class DataTracker:
         Returns:
             An iterator, where each element is as returned by the person() method
         """
-        url = "/api/v1/person/person/?time__gte=" + since + "&time__lt=" + until
+        url = "person/person/?time__gte=" + since + "&time__lt=" + until
         if name_contains is not None:
             url = url + "&name__contains=" + name_contains
         return self._retrieve_multi(url, Person)
@@ -770,17 +770,17 @@ class DataTracker:
 
 
     def email_for_person(self, person: Person) -> Iterator[Email]:
-        uri = "/api/v1/person/email/?person=" + str(person.id)
+        uri = "person/email/?person=" + str(person.id)
         return self._retrieve_multi(uri, Email)
 
 
     def email_history_for_address(self, email_addr: str) -> Iterator[HistoricalEmail]:
-        uri = "/api/v1/person/historicalemail/?address=" + email_addr
+        uri = "person/historicalemail/?address=" + email_addr
         return self._retrieve_multi(uri, HistoricalEmail)
 
 
     def email_history_for_person(self, person: Person) -> Iterator[HistoricalEmail]:
-        uri = "/api/v1/person/historicalemail/?person=" + str(person.id)
+        uri = "person/historicalemail/?person=" + str(person.id)
         return self._retrieve_multi(uri, HistoricalEmail)
 
 
@@ -797,7 +797,7 @@ class DataTracker:
         Returns:
             An iterator, where each element is an Email object
         """
-        url = "/api/v1/person/email/?time__gte=" + since + "&time__lt=" + until
+        url = "person/email/?time__gte=" + since + "&time__lt=" + until
         return self._retrieve_multi(url, Email)
 
 
@@ -815,7 +815,7 @@ class DataTracker:
             until   : str = "2038-01-19T03:14:07",
             doctype : Optional[DocumentType] = None,
             group   : Optional[Group]        = None) -> Iterator[Document]:
-        url = "/api/v1/doc/document/?time__gt=" + since + "&time__lt=" + until
+        url = "doc/document/?time__gt=" + since + "&time__lt=" + until
         if doctype is not None:
             url = url + "&type=" + doctype.slug
         if group is not None:
@@ -836,7 +836,7 @@ class DataTracker:
         Returns:
             A list of Document objects
         """
-        url = "/api/v1/doc/docalias/?name=" + alias
+        url = "doc/docalias/?name=" + alias
         return self._retrieve_multi(url, DocumentAlias)
 
 
@@ -934,7 +934,7 @@ class DataTracker:
         Returns:
             A sequence of Document objects, as returned by document_state()
         """
-        url   = "/api/v1/doc/state/"
+        url   = "doc/state/"
         if statetype is not None:
             url = url + "?type=" + statetype
         return self._retrieve_multi(url, DocumentState)
@@ -950,7 +950,7 @@ class DataTracker:
         Returns:
            A sequence of StateType objects
         """
-        return self._retrieve_multi("/api/v1/doc/statetype/", DocumentStateType)
+        return self._retrieve_multi("doc/statetype/", DocumentStateType)
 
 
     # Datatracker API endpoints returning information about document events:
@@ -984,7 +984,7 @@ class DataTracker:
         Returns:
            A sequence of DocumentEvent objects
         """
-        url = "/api/v1/doc/docevent/?time__gt=" + since + "&time__lt=" + until
+        url = "doc/docevent/?time__gt=" + since + "&time__lt=" + until
         if by is not None:
             url +=  "&by=" + str(by)
         if desc is not None:
@@ -1001,17 +1001,17 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/doc/documentauthor/?email=...        - documents by person
 
     def document_authors(self, document : Document) -> Iterator[DocumentAuthor]:
-        url = "/api/v1/doc/documentauthor/?document=" + str(document.id)
+        url = "doc/documentauthor/?document=" + str(document.id)
         return self._retrieve_multi(url, DocumentAuthor)
 
 
     def documents_authored_by_person(self, person : Person) -> Iterator[DocumentAuthor]:
-        url = "/api/v1/doc/documentauthor/?person=" + str(person.id)
+        url = "doc/documentauthor/?person=" + str(person.id)
         return self._retrieve_multi(url, DocumentAuthor)
 
 
     def documents_authored_by_email(self, email : Email) -> Iterator[DocumentAuthor]:
-        url = "/api/v1/doc/documentauthor/?email=" + email.address
+        url = "doc/documentauthor/?email=" + email.address
         return self._retrieve_multi(url, DocumentAuthor)
 
 
@@ -1065,7 +1065,7 @@ class DataTracker:
         Returns:
            A sequence of SubmissionEvent objects
         """
-        url = "/api/v1/submit/submissionevent/?time__gt=" + since + "&time__lt=" + until
+        url = "submit/submissionevent/?time__gt=" + since + "&time__lt=" + until
         if by is not None:
             url +=  "&by=" + str(by)
         if submission is not None:
@@ -1124,12 +1124,12 @@ class DataTracker:
         Returns:
             A DocumentType object
         """
-        uri = DocumentTypeURI("/api/v1/name/doctypename/" + doctype + "/")
+        uri = DocumentTypeURI("name/doctypename/" + doctype + "/")
         return self._retrieve(uri, DocumentType)
 
 
     def document_types(self) -> Iterator[DocumentType]:
-        return self._retrieve_multi("/api/v1/name/doctypename/", DocumentType)
+        return self._retrieve_multi("name/doctypename/", DocumentType)
 
 
     def stream(self, stream_uri: StreamURI) -> Optional[Stream]:
@@ -1137,7 +1137,7 @@ class DataTracker:
 
 
     def streams(self) -> Iterator[Stream]:
-        return self._retrieve_multi("/api/v1/name/streamname/", Stream)
+        return self._retrieve_multi("name/streamname/", Stream)
 
 
     # Datatracker API endpoints returning information about working groups:
@@ -1163,7 +1163,7 @@ class DataTracker:
 
 
     def group_from_acronym(self, acronym: str) -> Optional[Group]:
-        url    = "/api/v1/group/group/?acronym=" + acronym
+        url    = "group/group/?acronym=" + acronym
         groups = list(self._retrieve_multi(url, Group))
         if len(groups) == 0:
             return None
@@ -1179,7 +1179,7 @@ class DataTracker:
             name_contains : Optional[str]        = None,
             state         : Optional[GroupState] = None,
             parent        : Optional[Group]      = None) -> Iterator[Group]:
-        url = "/api/v1/group/group/?time__gt=" + since + "&time__lt=" + until
+        url = "group/group/?time__gt=" + since + "&time__lt=" + until
         if name_contains is not None:
             url = url + "&name__contains=" + name_contains
         if state is not None:
@@ -1203,12 +1203,12 @@ class DataTracker:
         Returns:
             A GroupState object
         """
-        url  = GroupStateURI("/api/v1/name/groupstatename/" + group_state + "/")
+        url  = GroupStateURI("name/groupstatename/" + group_state + "/")
         return self._retrieve(url, GroupState)
 
 
     def group_states(self) -> Iterator[GroupState]:
-        url = "/api/v1/name/groupstatename/"
+        url = "name/groupstatename/"
         return self._retrieve_multi(url, GroupState)
 
 
@@ -1235,7 +1235,7 @@ class DataTracker:
         The assignment of sessions to timeslots in a particular version of the
         meeting schedule.
         """
-        url = "/api/v1/meeting/schedtimesessassignment/?schedule=" + str(schedule.id)
+        url = "meeting/schedtimesessassignment/?schedule=" + str(schedule.id)
         return self._retrieve_multi(url, Assignment)
 
 
@@ -1263,7 +1263,7 @@ class DataTracker:
         """
         Return information about meetings taking place within a particular date range.
         """
-        url = "/api/v1/meeting/meeting/"
+        url = "meeting/meeting/"
         url = url + "?date__gte=" + start_date + "&date__lte=" + end_date
         if meeting_type is not None:
             url = url + "&type=" + meeting_type.slug
@@ -1283,7 +1283,7 @@ class DataTracker:
         Returns:
             A MeetingType object
         """
-        url = MeetingTypeURI("/api/v1/name/meetingtypename/" + meeting_type + "/")
+        url = MeetingTypeURI("name/meetingtypename/" + meeting_type + "/")
         return self._retrieve(url, MeetingType)
 
 
@@ -1297,7 +1297,7 @@ class DataTracker:
         Returns:
             An iterator of MeetingType objects
         """
-        return self._retrieve_multi("/api/v1/name/meetingtypename/", MeetingType)
+        return self._retrieve_multi("name/meetingtypename/", MeetingType)
 
 
 # =================================================================================================================================
