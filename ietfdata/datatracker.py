@@ -388,6 +388,7 @@ class Document:
     external_url       : str
 
     def __post_init__(self) -> None:
+        print(self)
         assert self.intended_std_level is _MISSING_TYPE or self.intended_std_level is None or self.intended_std_level.startswith("/api/v1/name/intendedstdlevelname/")
         assert self.std_level          is _MISSING_TYPE or self.std_level          is None or self.std_level.startswith("/api/v1/name/stdlevelname/")
 
@@ -884,6 +885,7 @@ class DataTracker:
     def document(self, document_uri: DocumentURI) -> Optional[Document]:
         d = Document.objects.get(document_uri.datum())
         return d
+
 
     def documents(self,
             since   : str = "1970-01-01T00:00:00",
