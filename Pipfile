@@ -14,6 +14,7 @@ coverage = "*"
 [packages]
 requests = "*"
 pavlova = "*"
+imapclient = "*"
 
 [requires]
 python_version = "3.7"
