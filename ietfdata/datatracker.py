@@ -3086,7 +3086,7 @@ class DataTracker:
             ietfer_name          : Optional[str]                   = None,
             state                : Optional[IPRDisclosureState]    = None,
             submitter_email      : Optional[str]                   = None,
-            submitter_name       : Optional[str]                   = None) -> Iterator[HolderIPRDisclosure]:
+            submitter_name       : Optional[str]                   = None) -> Iterator[ThirdPartyIPRDisclosure]:
         url = ThirdPartyIPRDisclosureURI("/api/v1/ipr/thirdpartyiprdisclosure/")
         url.params["time__gt"]       = since
         url.params["time__lt"]       = until
@@ -3104,7 +3104,7 @@ class DataTracker:
             url.params["submitter_email"] = submitter_email
         if submitter_name is not None:
             url.params["submitter_name"] = submitter_name
-        return self._retrieve_multi(url, HolderIPRDisclosure, deref = {"by": "id", "state": "slug"})
+        return self._retrieve_multi(url, ThirdPartyIPRDisclosure, deref = {"by": "id", "state": "slug"})
 
 
     def nondocspecific_ipr_disclosure(self, nondocspecific_ipr_disclosure_uri: NonDocSpecificIPRDisclosureURI) -> Optional[NonDocSpecificIPRDisclosure]:
