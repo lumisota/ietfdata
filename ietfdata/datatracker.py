@@ -1425,6 +1425,37 @@ class ThirdPartyIPRDisclosure(Resource):
     title                  : str
 
 
+@dataclass(frozen=True)
+class NonDocSpecificIPRDisclosureURI(URI):
+    def __post_init__(self) -> None:
+        assert self.uri.startswith("/api/v1/ipr/nondocspecificiprdisclosure/")
+
+
+@dataclass(frozen=True)
+class NonDocSpecificIPRDisclosure(Resource):
+    by                     : PersonURI
+    compliant              : bool
+    docs                   : List[DocumentAliasURI]
+    has_patent_pending     : bool
+    holder_contact_email   : str
+    holder_contact_info    : str
+    holder_contact_name    : str
+    holder_legal_name      : str
+    id                     : int
+    iprdisclosurebase_ptr  : IPRDisclosureBaseURI
+    notes                  : str
+    other_designations     : str
+    patent_info            : str
+    rel                    : List[IPRDisclosureBaseURI]
+    resource_uri           : NonDocSpecificIPRDisclosureURI
+    state                  : IPRDisclosureStateURI
+    statement              : str
+    submitter_email        : str
+    submitter_name         : str
+    time                   : datetime
+    title                  : str
+
+
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Types relating to reviews:
 
@@ -2917,7 +2948,7 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/ipr/holderiprdisclosure/
     # * https://datatracker.ietf.org/api/v1/ipr/thirdpartyiprdisclosure
     #
-    #   https://datatracker.ietf.org/api/v1/ipr/nondocspecificiprdisclosure/
+    # * https://datatracker.ietf.org/api/v1/ipr/nondocspecificiprdisclosure/
     #   https://datatracker.ietf.org/api/v1/ipr/relatedipr/
     #
     #   https://datatracker.ietf.org/api/v1/ipr/iprevent/
@@ -3074,6 +3105,37 @@ class DataTracker:
         if submitter_name is not None:
             url.params["submitter_name"] = submitter_name
         return self._retrieve_multi(url, HolderIPRDisclosure, deref = {"by": "id", "state": "slug"})
+
+
+    def nondocspecific_ipr_disclosure(self, nondocspecific_ipr_disclosure_uri: NonDocSpecificIPRDisclosureURI) -> Optional[NonDocSpecificIPRDisclosure]:
+        return self._retrieve(nondocspecific_ipr_disclosure_uri, NonDocSpecificIPRDisclosure)
+
+
+    def nondocspecific_ipr_disclosures(self,
+            since                : str                             = "1970-01-01T00:00:00",
+            until                : str                             = "2038-01-19T03:14:07",
+            by                   : Optional[Person]                = None,
+            holder_contact_email : Optional[str]                   = None,
+            holder_legal_name    : Optional[str]                   = None,
+            state                : Optional[IPRDisclosureState]    = None,
+            submitter_email      : Optional[str]                   = None,
+            submitter_name       : Optional[str]                   = None) -> Iterator[NonDocSpecificIPRDisclosure]:
+        url = NonDocSpecificIPRDisclosureURI("/api/v1/ipr/nondocspecificiprdisclosure/")
+        url.params["time__gt"]       = since
+        url.params["time__lt"]       = until
+        if by is not None:
+            url.params["by"] = by.id
+        if holder_contact_email is not None:
+            url.params["holder_contact_email"] = holder_contact_email
+        if holder_legal_name is not None:
+            url.params["holder_legal_name"] = holder_legal_name
+        if state is not None:
+            url.params["state"] = state.slug
+        if submitter_email is not None:
+            url.params["submitter_email"] = submitter_email
+        if submitter_name is not None:
+            url.params["submitter_name"] = submitter_name
+        return self._retrieve_multi(url, NonDocSpecificIPRDisclosure, deref = {"by": "id", "state": "slug"})
 
 
     # ----------------------------------------------------------------------------------------------------------------------------

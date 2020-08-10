@@ -2498,6 +2498,68 @@ class TestDatatracker(unittest.TestCase):
         self.assertIsNot(thirdparty_ipr_disclosures, None)
 
 
+    def test_nondocspecific_ipr_disclosure(self) -> None:
+        nondocspecific_ipr_disclosure = self.dt.nondocspecific_ipr_disclosure(NonDocSpecificIPRDisclosureURI("/api/v1/ipr/nondocspecificiprdisclosure/4237/"))
+        if nondocspecific_ipr_disclosure is not None:
+            self.assertEqual(nondocspecific_ipr_disclosure.by,                                   PersonURI("/api/v1/person/person/1/"))
+            self.assertEqual(nondocspecific_ipr_disclosure.compliant,                            True)
+            self.assertEqual(nondocspecific_ipr_disclosure.docs,                                 [])
+            self.assertEqual(nondocspecific_ipr_disclosure.has_patent_pending,                   True)
+            self.assertEqual(nondocspecific_ipr_disclosure.holder_contact_email,                 "patrec@protonmail.com")
+            self.assertEqual(nondocspecific_ipr_disclosure.holder_contact_info,                  "Email at Patrec@protonmail.com for more information or tglassey1@protonmail.com")
+            self.assertEqual(nondocspecific_ipr_disclosure.holder_contact_name,                  "Patent and IP Recoveries LLC")
+            self.assertEqual(nondocspecific_ipr_disclosure.holder_legal_name,                    "Patent and IP Recoveries llc as use licensee for US6370629 & US6393126")
+            self.assertEqual(nondocspecific_ipr_disclosure.id,                                   4237)
+            self.assertEqual(nondocspecific_ipr_disclosure.iprdisclosurebase_ptr,                IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/4237/"))
+            self.assertEqual(nondocspecific_ipr_disclosure.notes,                                "See the following link for more information on GNU, Creative Commons limitations and all use requirements for all derivative uses.\r\n\r\nhttps://patentandiprecoveries.wordpress.com/2019/03/13/dmca-requirements-set-by-usdc-14-03629-wha/")
+            self.assertEqual(nondocspecific_ipr_disclosure.other_designations,                   "")
+            self.assertEqual(nondocspecific_ipr_disclosure.patent_info,                          "Number: US6370629, US6393136\nInventor: Todd Glassey\nTitle: Controlling Access to Stored Information (et Al)\nDate: 2002-03-23\nNotes: Both US6370629 and US6393126 have open source use requirements set and judicially perfected bu USDC 14-03629/WHA.")
+            self.assertEqual(nondocspecific_ipr_disclosure.rel,                                  [IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/4227/")])
+            self.assertEqual(nondocspecific_ipr_disclosure.resource_uri,                         NonDocSpecificIPRDisclosureURI("/api/v1/ipr/nondocspecificiprdisclosure/4237/"))
+            self.assertEqual(nondocspecific_ipr_disclosure.state,                                IPRDisclosureStateURI("/api/v1/name/iprdisclosurestatename/pending/"))
+            self.assertEqual(nondocspecific_ipr_disclosure.statement,                            "Any and  all derivative works taken from the two patent families methods must meet the following DMCA requirements for use of any of the 2 SEPs (US6370629 and US6393126) families methods globally. Additionally any use of said same US6370629 methods in Au, Br, Ca, EU, Ko, Jp, & Za must address fraud damages issues for illegally filed and abandoned instances of US6370629 in those Jurisdictions. \r\n\r\nThese opensource licensing requirements include updating all product licensing disclosing these requirements 1) the mandatory hard wiring of California State Law as choice of law per section 8.1 of the patents settlement agreement; and 2) the implementation of a compliance program proving said same per section 8.4 of the patents settlement agreement; and 3) updating all licensing per section 8.7 of the patent settlement agreement \"until such time as commercial licensing is put in place to release those requirements\". \r\n\r\nSee:\r\nhttps://patentandiprecoveries.wordpress.com/2019/03/13/dmca-requirements-set-by-usdc-14-03629-wha/")
+            self.assertEqual(nondocspecific_ipr_disclosure.submitter_email,                      "patrec@protonmail.com")
+            self.assertEqual(nondocspecific_ipr_disclosure.submitter_name,                       "Patent and IP Recoveries LLC")
+            self.assertEqual(nondocspecific_ipr_disclosure.time,                                 datetime.fromisoformat("2020-07-29T05:10:11"))
+            self.assertEqual(nondocspecific_ipr_disclosure.title,                                "Patent and IP Recoveries llc as use licensee for US6370629 & US6393126's General License Statement")
+        else:
+            self.fail("Cannot find non-doc specific IPR disclosure")
+
+
+    def test_nondocspecific_ipr_disclosures(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures()
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_by(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(by=self.dt.person(PersonURI("/api/v1/person/person/1/")))
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_holder_contact_email(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(holder_contact_email="patrec@protonmail.com")
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_holder_legal_name(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(holder_legal_name="Patent and IP Recoveries llc as use licensee for US6370629 & US6393126")
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_state(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(state=self.dt.ipr_disclosure_state(IPRDisclosureStateURI("/api/v1/name/iprdisclosurestatename/pending/")))
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_submitter_email(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(submitter_email="patrec@protonmail.com")
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
+
+    def test_nondocspecific_ipr_disclosures_submitter_name(self) -> None:
+        nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(submitter_name="Patent and IP Recoveries LLC")
+        self.assertIsNot(nondocspecific_ipr_disclosures, None)
+
     # -----------------------------------------------------------------------------------------------------------------------------
     # Tests relating to reviews:
 
