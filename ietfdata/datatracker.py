@@ -1456,6 +1456,21 @@ class NonDocSpecificIPRDisclosure(Resource):
     title                  : str
 
 
+@dataclass(frozen=True)
+class RelatedIPRURI(URI):
+    def __post_init__(self) -> None:
+        assert self.uri.startswith("/api/v1/ipr/relatedipr/")
+
+
+@dataclass(frozen=True)
+class RelatedIPR(Resource):
+    id           : int
+    relationship : RelationshipTypeURI
+    resource_uri : RelatedIPRURI
+    source       : IPRDisclosureBaseURI
+    target       : IPRDisclosureBaseURI
+
+
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Types relating to reviews:
 
@@ -2949,7 +2964,7 @@ class DataTracker:
     # * https://datatracker.ietf.org/api/v1/ipr/thirdpartyiprdisclosure
     #
     # * https://datatracker.ietf.org/api/v1/ipr/nondocspecificiprdisclosure/
-    #   https://datatracker.ietf.org/api/v1/ipr/relatedipr/
+    # * https://datatracker.ietf.org/api/v1/ipr/relatedipr/
     #
     #   https://datatracker.ietf.org/api/v1/ipr/iprevent/
     #   https://datatracker.ietf.org/api/v1/ipr/legacymigrationiprevent/
@@ -3137,6 +3152,23 @@ class DataTracker:
             url.params["submitter_name"] = submitter_name
         return self._retrieve_multi(url, NonDocSpecificIPRDisclosure, deref = {"by": "id", "state": "slug"})
 
+
+    def related_ipr(self, related_ipr_uri: RelatedIPRURI) -> Optional[RelatedIPR]:
+        return self._retrieve(related_ipr_uri, RelatedIPR)
+
+
+    def related_iprs(self,
+            relationship   : Optional[RelationshipType]   = None,
+            source         : Optional[IPRDisclosureBase]  = None,
+            target         : Optional[IPRDisclosureBase]  = None) -> Iterator[RelatedIPR]:
+        url = RelatedIPRURI("/api/v1/ipr/relatedipr/")
+        if relationship is not None:
+            url.params["relationship"] = relationship.slug
+        if source is not None:
+            url.params["source"] = source.id
+        if target is not None:
+            url.params["target"] = target.id
+        return self._retrieve_multi(url, RelatedIPR, deref = {"relationship": "slug", "source": "id", "target": "id"})
 
     # ----------------------------------------------------------------------------------------------------------------------------
     # Datatracker API endpoints returning information about liaison statements:

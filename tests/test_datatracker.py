@@ -2560,6 +2560,39 @@ class TestDatatracker(unittest.TestCase):
         nondocspecific_ipr_disclosures = self.dt.nondocspecific_ipr_disclosures(submitter_name="Patent and IP Recoveries LLC")
         self.assertIsNot(nondocspecific_ipr_disclosures, None)
 
+
+    def test_related_ipr(self) -> None:
+        related_ipr = self.dt.related_ipr(RelatedIPRURI("/api/v1/ipr/relatedipr/1/"))
+        if related_ipr is not None:
+            self.assertEqual(related_ipr.id,           1)
+            self.assertEqual(related_ipr.relationship, RelationshipTypeURI("/api/v1/name/docrelationshipname/updates/"))
+            self.assertEqual(related_ipr.resource_uri, RelatedIPRURI("/api/v1/ipr/relatedipr/1/"))
+            self.assertEqual(related_ipr.source,       IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/497/"))
+            self.assertEqual(related_ipr.target,       IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/135/"))
+        else:
+            self.fail("Cannot find related IPR")
+
+
+    def test_related_iprs(self) -> None:
+        related_iprs = self.dt.related_iprs()
+        self.assertIsNot(related_iprs, None)
+
+
+    def test_related_iprs_relationship(self) -> None:
+        related_iprs = self.dt.related_iprs(relationship=self.dt.relationship_type(RelationshipTypeURI("/api/v1/name/docrelationshipname/updates/")))
+        self.assertIsNot(related_iprs, None)
+
+
+    def test_related_iprs_source(self) -> None:
+        related_iprs = self.dt.related_iprs(source=self.dt.ipr_disclosure_base(IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/497/")))
+        self.assertIsNot(related_iprs, None)
+
+
+    def test_related_iprs_target(self) -> None:
+        related_iprs = self.dt.related_iprs(target=self.dt.ipr_disclosure_base(IPRDisclosureBaseURI("/api/v1/ipr/iprdisclosurebase/135/")))
+        self.assertIsNot(related_iprs, None)
+
+
     # -----------------------------------------------------------------------------------------------------------------------------
     # Tests relating to reviews:
 
